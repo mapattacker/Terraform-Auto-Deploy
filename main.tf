@@ -2,6 +2,10 @@ locals {
   resource_name = "${var.division}-${var.project_code}-${var.purpose}"
 }
 
+# get AWS region and account id
+data "aws_region" "current" {}
+data "aws_caller_identity" "current" {}
+
 
 # ========== Create ECR ==========
 
@@ -33,11 +37,51 @@ EOF
 }
 
 
-# ========== Create S3 ==========
+# # ========== Create S3 ==========
 
 resource "aws_s3_bucket" "this" {
   bucket = "s3-${local.resource_name}"
 }
+
+resource "aws_s3_bucket_public_access_block" "this" {
+  bucket                  = aws_s3_bucket.this.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+
+# ========== Instance Profile ==========
+
+resource "aws_iam_instance_profile" "this" {
+  name     = "iamr-${local.resource_name}"
+  role     = aws_iam_role.this.name
+}
+
+
+resource "aws_iam_role" "this" {
+  name               = "iamr-${local.resource_name}"
+  assume_role_policy = file("policies/assume_role.json")
+
+  inline_policy {
+    name   = "inline_policy"
+    policy = templatefile("policies/inline.json", 
+      {
+        s3    = aws_s3_bucket.this.bucket
+        loggroup = aws_cloudwatch_log_group.this.name
+        aws_region = data.aws_region.current.name
+        aws_account_id = data.aws_caller_identity.current.account_id
+      }
+    )
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "attach_policy_ssm" {
+  role       = aws_iam_role.this.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
 
 
 # ========== Create EC2 ==========
@@ -47,11 +91,16 @@ resource "aws_instance" "ec2" {
   instance_type        = var.instance_type
   subnet_id            = var.subnet_id
   security_groups      = [aws_security_group.this.id]
-  iam_instance_profile = "AmazonSSMRoleForInstancesQuickSetup"
+  iam_instance_profile = aws_iam_role.this.name
   user_data            = file("userdata/ubuntu.sh")
 
   root_block_device {
     volume_size = var.ebs_volume
+  }
+
+  tags = {
+    Name  = "vm-${local.resource_name}"
+    Patch = true
   }
 }
 

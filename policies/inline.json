@@ -1,0 +1,33 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "ListPlaybookBucket",
+            "Effect": "Allow",
+            "Action": "s3:ListBucket",
+            "Resource": "arn:aws:s3:::${s3}"
+        },
+        {
+            "Sid": "DownloadPlaybook",
+            "Effect": "Allow",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::${s3}/*"
+        },
+        {
+            "Sid": "DescribeLogGroups",
+            "Effect": "Allow",
+            "Action": "logs:DescribeLogGroups",
+            "Resource": "arn:aws:logs:${aws_region}:${aws_account_id}:log-group:*"
+        },
+        {
+            "Sid": "PutToLogStream",
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogStream",
+                "logs:DescribeLogStreams",
+                "logs:PutLogEvents"
+            ],
+            "Resource": "arn:aws:logs:${aws_region}:${aws_account_id}:log-group:${loggroup}:*"
+        }
+    ]
+}
