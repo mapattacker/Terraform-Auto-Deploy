@@ -59,7 +59,6 @@ resource "aws_iam_instance_profile" "this" {
   role     = aws_iam_role.this.name
 }
 
-
 resource "aws_iam_role" "this" {
   name               = "iamr-${local.resource_name}"
   assume_role_policy = file("policies/assume_role.json")
