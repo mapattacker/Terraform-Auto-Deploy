@@ -37,7 +37,7 @@ EOF
 }
 
 
-# # ========== Create S3 ==========
+# ========== Create S3 ==========
 
 resource "aws_s3_bucket" "this" {
   bucket = "s3-${local.resource_name}"
