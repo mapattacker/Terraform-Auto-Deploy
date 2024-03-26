@@ -1,0 +1,26 @@
+version: "3.7"
+
+x-common: &common
+  logging:
+    options:
+      max-size: "10m"
+      max-file: "5"
+  restart: unless-stopped
+  networks:
+    - mynetwork
+  deploy:
+    restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+
+services:
+  api:
+    container_name: api
+    image: ${AWS_ACCOUNT}.dkr.ecr.{AWS_REGION}.amazonaws.com/${ECR}:latest
+    ports:
+      - 80:5000
+
+networks:
+  mynetwork:
+    name: mynetwork

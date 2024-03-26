@@ -15,7 +15,7 @@ docker compose version
 
 
 echo "==============================="
-echo "[INFO ]Installing aws-cliv2..."
+echo "[INFO] Installing aws-cliv2..."
 # jq required to parse outputs from aws-cli
 sudo apt-get update
 sudo apt-get install -y jq unzip
@@ -27,7 +27,16 @@ sudo rm -rf aws
 
 
 echo "==============================="
-echo "[INFO ]Installing Ansible..."
+echo "[INFO] Installing Ansible..."
 sudo apt-get update -y
 sudo apt-get install -y ansible
 ansible --version
+
+
+echo "==============================="
+echo "[INFO] Create dotenv..."
+AWS_ACCOUNT=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .accountId)
+AWS_REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/region)
+echo AWS_ACCOUNT=${AWS_ACCOUNT} > .env
+echo AWS_REGION=${AWS_REGION} >> .env
+echo ECR=${{ECR}} >> .env

@@ -1,24 +1,23 @@
 INSTALL_DEP="False"
 PLAYBOOK="deployment"
 INSTANCE_NAME="vm-mydivision-deploytest-model"
-AWS_S3_BUCKET="s3://s3-mydivision-deploytest-model"
+AWS_S3_BUCKET="s3-mydivision-deploytest-model"
 AWS_CLOUDWATCH="/aws/ssm/runcommand/logs"
+AWS_DEFAULT_REGION="ap-southeast-1"
+COMPOSE_PATH="s3-mydivision-deploytest-model"
 
 
 INSTANCE_ID=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=${INSTANCE_NAME}" "Name=instance-state-name,Values=pending,running,stopping,stopped" --query "Reservations[*].Instances[*].InstanceId" --output text)
-echo $INSTANCE_ID
-
 result=`aws ssm send-command \
             --document-name "AWS-ApplyAnsiblePlaybooks" \
             --document-version "1" \
             --targets '[{"Key":"InstanceIds","Values":["'${INSTANCE_ID}'"]}]' \
-            --parameters '{"SourceType":["S3"],"SourceInfo":["{\"path\": \"https://'${AWS_S3_BUCKET}'.s3.'${AWS_DEFAULT_REGION}'.amazonaws.com/'${PLAYBOOK}'.yml\"}"],"InstallDependencies":["'${INSTALL_DEP}'"],"PlaybookFile":["'${PLAYBOOK}'.yml"],"Check":["False"],"Verbose":["-v"],"TimeoutSeconds":["3600"]}' \
+            --parameters '{"SourceType":["S3"],"SourceInfo":["{\"path\": \"https://'${AWS_S3_BUCKET}'.s3.'${AWS_DEFAULT_REGION}'.amazonaws.com/'${PLAYBOOK}'.yml\"}"],"InstallDependencies":["'${INSTALL_DEP}'"],"PlaybookFile":["'${PLAYBOOK}'.yml"],"ExtraVariables":["COMPOSE_PATH='${COMPOSE_PATH}'"],"Check":["False"],"Verbose":["-v"],"TimeoutSeconds":["3600"]}' \
             --timeout-seconds 600 \
             --max-concurrency "50" \
             --max-errors "0" \
             --cloud-watch-output-config '{"CloudWatchOutputEnabled":true,"CloudWatchLogGroupName":"'${AWS_CLOUDWATCH}'"}'`
 id=$(echo $result | jq -r .Command.CommandId)
-echo $id
 
 # poll status, 15mins (90 * 10sec) timeout
 # refer to status types here: https://docs.aws.amazon.com/systems-manager/latest/userguide/monitor-commands.html
