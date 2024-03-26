@@ -70,8 +70,8 @@ resource "aws_iam_role" "this" {
       {
         s3             = aws_s3_bucket.this.bucket
         loggroup       = aws_cloudwatch_log_group.this.name
-        aws_region     = local.AWS_ACCOUNT
-        aws_account_id = local.AWS_REGION
+        aws_region     = local.AWS_REGION
+        aws_account_id = local.AWS_ACCOUNT
         ecr            = aws_ecr_repository.this.name
       }
     )
