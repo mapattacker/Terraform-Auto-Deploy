@@ -66,7 +66,7 @@ resource "aws_iam_role" "this" {
 
   inline_policy {
     name = "inline_policy"
-    policy = templatefile("policies/inline.json",
+    policy = templatefile("policies/inline_deploy.json",
       {
         s3             = aws_s3_bucket.this.bucket
         loggroup       = aws_cloudwatch_log_group.this.name
@@ -87,69 +87,69 @@ resource "aws_iam_role_policy_attachment" "attach_policy_ssm" {
 
 # ========== Create EC2 ==========
 
-resource "aws_instance" "ec2" {
-  ami                  = data.aws_ami.ubuntu22x86.id
-  instance_type        = var.instance_type
-  subnet_id            = var.subnet_id
-  security_groups      = [aws_security_group.this.id]
-  iam_instance_profile = aws_iam_role.this.name
-  user_data            = templatefile("userdata/ubuntu.sh",
-      {
-        ECR = aws_ecr_repository.this.name
-      }
-    )
+# resource "aws_instance" "ec2" {
+#   ami                  = data.aws_ami.ubuntu22x86.id
+#   instance_type        = var.instance_type
+#   subnet_id            = var.subnet_id
+#   security_groups      = [aws_security_group.this.id]
+#   iam_instance_profile = aws_iam_role.this.name
+#   user_data            = templatefile("userdata/ubuntu.sh",
+#       {
+#         ECR = aws_ecr_repository.this.name
+#       }
+#     )
 
-  root_block_device {
-    volume_size = var.ebs_volume
-  }
+#   root_block_device {
+#     volume_size = var.ebs_volume
+#   }
 
-  tags = {
-    Name  = "vm-${local.resource_name}"
-    Patch = true
-  }
-}
+#   tags = {
+#     Name  = "vm-${local.resource_name}"
+#     Patch = true
+#   }
+# }
 
-data "aws_ami" "ubuntu22x86" {
-  most_recent = true
-  owners      = ["amazon"]
-  # https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-images.html
-  filter {
-    name   = "name"
-    values = ["*hvm-ssd/ubuntu-jammy-22.04-amd64-server*"]
-  }
-}
+# data "aws_ami" "ubuntu22x86" {
+#   most_recent = true
+#   owners      = ["amazon"]
+#   # https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-images.html
+#   filter {
+#     name   = "name"
+#     values = ["*hvm-ssd/ubuntu-jammy-22.04-amd64-server*"]
+#   }
+# }
 
-resource "aws_security_group" "this" {
-  name   = "tf-sg-${local.resource_name}"
-  vpc_id = var.vpc_id
+# resource "aws_security_group" "this" {
+#   name   = "tf-sg-${local.resource_name}"
+#   vpc_id = var.vpc_id
 
-  ingress {
-    # http access in
-    protocol         = "tcp"
-    from_port        = 80
-    to_port          = 80
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
+#   ingress {
+#     # http access in
+#     protocol         = "tcp"
+#     from_port        = 80
+#     to_port          = 80
+#     cidr_blocks      = ["0.0.0.0/0"]
+#     ipv6_cidr_blocks = ["::/0"]
+#   }
 
-  ingress {
-    # https access in
-    protocol         = "tcp"
-    from_port        = 443
-    to_port          = 443
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
+#   ingress {
+#     # https access in
+#     protocol         = "tcp"
+#     from_port        = 443
+#     to_port          = 443
+#     cidr_blocks      = ["0.0.0.0/0"]
+#     ipv6_cidr_blocks = ["::/0"]
+#   }
 
-  egress {
-    # full access out
-    protocol         = "-1"
-    from_port        = 0
-    to_port          = 0
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
-}
+#   egress {
+#     # full access out
+#     protocol         = "-1"
+#     from_port        = 0
+#     to_port          = 0
+#     cidr_blocks      = ["0.0.0.0/0"]
+#     ipv6_cidr_blocks = ["::/0"]
+#   }
+# }
 
 # ========== Create Cloudwatch Log Group ==========
 
