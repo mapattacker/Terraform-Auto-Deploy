@@ -17,7 +17,7 @@ x-common: &common
 services:
   api:
     container_name: api
-    image: ${AWS_ACCOUNT}.dkr.ecr.{AWS_REGION}.amazonaws.com/${ECR}:latest
+    image: ${AWS_ACCOUNT}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR}:latest
     ports:
       - 80:5000
 

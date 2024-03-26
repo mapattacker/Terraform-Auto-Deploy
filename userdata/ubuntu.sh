@@ -34,9 +34,10 @@ ansible --version
 
 
 echo "==============================="
-echo "[INFO] Create dotenv..."
+echo "[INFO] Create dotenv for docker-compose.yml..."
+cd /home/ubuntu/
 AWS_ACCOUNT=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .accountId)
 AWS_REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/region)
-echo AWS_ACCOUNT=${AWS_ACCOUNT} > .env
-echo AWS_REGION=${AWS_REGION} >> .env
-echo ECR=${{ECR}} >> .env
+echo AWS_ACCOUNT=$${AWS_ACCOUNT} > .env
+echo AWS_REGION=$${AWS_REGION} >> .env
+echo ECR=${ECR} >> .env

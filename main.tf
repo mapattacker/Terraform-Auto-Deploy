@@ -93,7 +93,11 @@ resource "aws_instance" "ec2" {
   subnet_id            = var.subnet_id
   security_groups      = [aws_security_group.this.id]
   iam_instance_profile = aws_iam_role.this.name
-  user_data            = file("userdata/ubuntu.sh")
+  user_data            = templatefile("userdata/ubuntu.sh",
+      {
+        ECR = aws_ecr_repository.this.name
+      }
+    )
 
   root_block_device {
     volume_size = var.ebs_volume

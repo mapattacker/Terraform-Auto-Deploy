@@ -17,7 +17,7 @@
 
 
   - name: download docker-compose
-    command: aws s3 cp s3://{{COMPOSE_PATH}} {{home_dir}}/docker-compose.yml
+    command: aws s3 cp s3://{{COMPOSE_PATH}}/docker-compose.yml {{home_dir}}/docker-compose.yml
 
 
   # AL2023 has a new API that requires a token to retrieve instance metadata
