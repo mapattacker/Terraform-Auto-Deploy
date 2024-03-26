@@ -21,7 +21,7 @@ resource "null_resource" "upload_playbook" {
   depends_on = [aws_s3_bucket.this]
   provisioner "local-exec" {
     command = <<-EOT
-        aws s3 cp artefacts/deployment.yml s3://${local.S3}
+        aws s3 cp scripts/deployment.yml s3://${local.S3}
     EOT
   }
 }
