@@ -1,0 +1,53 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "DescribeInstanceAndSsmID",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:DescribeInstances",
+                "ssm:GetCommandInvocation"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "SendSsmCommand",
+            "Effect": "Allow",
+            "Action": [
+                "ssm:SendCommand"
+            ],
+            "Resource": [
+                "arn:aws:ec2:ap-southeast-1:*:instance/*",
+                "arn:aws:ssm:ap-southeast-1:*:document/AWS-ApplyAnsiblePlaybooks",
+                "arn:aws:ssm:ap-southeast-1:*:managed-instance/*"
+            ]
+        },
+        {
+            "Sid": "RetrieveSsmLogs",
+            "Effect": "Allow",
+            "Action": [
+                "logs:GetLogEvents"
+            ],
+            "Resource": "arn:aws:logs:ap-southeast-1:*:log-group:/aws/ssm/runcommand/logs:log-stream:*"
+        },
+        {
+            "Sid": "LoginECR",
+            "Action": "ecr:GetAuthorizationToken",
+            "Effect": "Allow",
+            "Resource": "*"
+        },
+        {
+            "Sid": "PushToECR",
+            "Action": [
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:BatchGetImage",
+                "ecr:InitiateLayerUpload",
+                "ecr:UploadLayerPart",
+                "ecr:CompleteLayerUpload",
+                "ecr:PutImage"
+            ],
+            "Effect": "Allow",
+            "Resource": "arn:aws:ecr:ap-southeast-1:*:repository/ecr-ml-inference"
+        }
+    ]
+}
