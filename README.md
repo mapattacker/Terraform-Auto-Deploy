@@ -1,5 +1,6 @@
 # Terraform-Auto-Deploy
 
+A demonstration on how to deploy a container to an EC2 instance using SSM Run Command, Ansible and docker compose.
 
 ## Infrastructure Setup
 
