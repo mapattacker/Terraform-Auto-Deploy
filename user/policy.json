@@ -2,13 +2,28 @@
     "Version": "2012-10-17",
     "Statement": [
         {
-            "Sid": "DescribeInstanceAndSsmID",
+            "Sid": "DescribeInstanceAndGetSsmID",
             "Effect": "Allow",
             "Action": [
                 "ec2:DescribeInstances",
+                "ec2:DescribeInstanceStatus",
                 "ssm:GetCommandInvocation"
             ],
             "Resource": "*"
+        },
+        {
+            "Sid": "EC2StartStop",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:StartInstances",
+                "ec2:StopInstances"
+            ],
+            "Resource": "*",
+            "Condition": {
+                "StringEquals": {
+                    "ec2:ResourceTag/Project-Code": "yourprojectcode"
+                }
+            }
         },
         {
             "Sid": "SendSsmCommand",
